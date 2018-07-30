@@ -34,32 +34,27 @@ class AreaChart extends React.Component {
   };
 
   render() {
-    const {series, lines, startDate, ...props} = this.props;
+    const {series, lines, ...props} = this.props;
     if (!series.length) return null;
-
-    const numDates = series[0].data.length;
-    const DATES = [...Array(numDates)].map((value, i) =>
-      moment(startDate)
-        .add(i, 'day')
-        .format('MMM D')
-    );
 
     return (
       <BaseChart
         {...props}
         options={{
           xAxis: XAxis({
-            type: 'category',
-            data: DATES,
+            type: 'time',
             boundaryGap: false,
+            axisLabel: {
+              formatter: (value, index) => moment(value).format('MMM D'),
+            },
           }),
           yAxis: YAxis({}),
           series: [
             ...series.map((s, i) =>
               AreaSeries({
                 stack: 'test',
-                name: s.name,
-                data: s.data,
+                name: s.seriesName,
+                data: s.data.map(({value, category}) => [category, value]),
                 lineStyle: {
                   color: '#fff',
                   width: 2,
@@ -70,16 +65,18 @@ class AreaChart extends React.Component {
                 },
               })
             ),
-            ...lines.map(s =>
-              LineSeries({
-                name: s.name,
-                data: s.data,
-                lineStyle: {
-                  color: theme.gray1,
-                  type: 'dotted',
-                },
-              })
-            ),
+            ...((lines &&
+              lines.map(s =>
+                LineSeries({
+                  name: s.name,
+                  data: s.data,
+                  lineStyle: {
+                    color: theme.gray1,
+                    type: 'dotted',
+                  },
+                })
+              )) ||
+              []),
           ],
         }}
       />
