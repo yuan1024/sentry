@@ -242,6 +242,8 @@ const AssigneeSelectorComponent = createReactClass({
         )}
         {!loading && (
           <DropdownAutoComplete
+            maxHeight={400}
+            zIndex={2}
             onOpen={e => {
               // This can be called multiple times and does not always have `event`
               if (!e) return;

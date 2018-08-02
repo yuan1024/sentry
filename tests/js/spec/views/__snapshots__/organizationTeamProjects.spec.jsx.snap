@@ -79,8 +79,9 @@ exports[`OrganizationTeamProjects Should render 1`] = `
                             },
                           ]
                         }
+                        maxHeight={300}
                         onSelect={[Function]}
-                        searchPadding="16px 8px"
+                        searchPadding="8px"
                         searchPlaceholder="Filter search"
                       >
                         <AutoComplete

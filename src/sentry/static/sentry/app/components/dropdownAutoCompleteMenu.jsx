@@ -80,6 +80,19 @@ class DropdownAutoCompleteMenu extends React.Component {
     blendCorner: PropTypes.bool,
 
     /**
+     * Max height of dropdown menu
+     */
+    maxHeight: PropTypes.number,
+
+    /**
+     * Add z-index to menu. Note this is not added by default because some
+     * implementations of DropdownAutocomplete DEPEND on no z-index.
+     * This is when we want to blend the bottom border of the actor button with the dropdown menu
+     * so that it looks a bit more seamless.
+     */
+    zIndex: PropTypes.number,
+
+    /**
      * Search input's placeholder text
      */
     searchPlaceholder: PropTypes.string,
@@ -113,10 +126,11 @@ class DropdownAutoCompleteMenu extends React.Component {
 
   static defaultProps = {
     onSelect: () => {},
+    maxHeight: 300,
     blendCorner: true,
     emptyMessage: t('No items'),
     searchPlaceholder: t('Filter search'),
-    searchPadding: `${space(2)} ${space(1)}`,
+    searchPadding: `${space(1)}`,
     itemPadding: `${space(1)}`,
   };
 
@@ -165,6 +179,7 @@ class DropdownAutoCompleteMenu extends React.Component {
       menuProps,
       alignMenu,
       blendCorner,
+      maxHeight,
       emptyMessage,
       noResultsMessage,
       style,
@@ -175,6 +190,7 @@ class DropdownAutoCompleteMenu extends React.Component {
       searchPadding,
       itemPadding,
       busy,
+      zIndex,
       ...props
     } = this.props;
 
@@ -227,6 +243,7 @@ class DropdownAutoCompleteMenu extends React.Component {
                     blendCorner,
                     alignMenu,
                     menuWithArrow,
+                    zIndex,
                   })}
                 >
                   <Flex>
@@ -243,7 +260,7 @@ class DropdownAutoCompleteMenu extends React.Component {
                   <div>
                     {menuHeader && <LabelWithPadding>{menuHeader}</LabelWithPadding>}
 
-                    <StyledItemList>
+                    <StyledItemList maxHeight={maxHeight}>
                       {showNoItems && <EmptyMessage>{emptyMessage}</EmptyMessage>}
                       {showNoResultsMessage && (
                         <EmptyMessage>
@@ -376,7 +393,7 @@ const StyledInput = styled(Input)`
   &:hover {
     border: 1px solid transparent;
     border-bottom: 1px solid ${p => p.theme.borderLight};
-    border-radius: 0;
+    border-radius: ${p => `${p.theme.borderRadius} ${p.theme.borderRadius} 0 0`};
     box-shadow: none;
     font-size: 13px;
     padding: ${p => p.padding};
@@ -429,7 +446,7 @@ const StyledMenu = styled('div')`
   position: absolute;
   top: calc(100% - 1px);
   min-width: 250px;
-  z-index: 2; /* this is because pagination btn-group have z-index: 1 */
+  ${p => (p.zIndex > 0 ? `z-index: ${p.zIndex};` : '')};
   right: 0;
   box-shadow: ${p => p.theme.dropShadowLight};
 
@@ -440,7 +457,7 @@ const StyledMenu = styled('div')`
 `;
 
 const StyledItemList = styled('div')`
-  max-height: 300px;
+  max-height: ${p => p.maxHeight}px;
   overflow-y: auto;
 `;
 
