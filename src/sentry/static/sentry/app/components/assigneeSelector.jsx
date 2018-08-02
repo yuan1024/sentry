@@ -1,3 +1,4 @@
+import {css} from 'emotion';
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
@@ -15,6 +16,7 @@ import DropdownAutoComplete from 'app/components/dropdownAutoComplete';
 import Feature from 'app/components/feature';
 import GroupStore from 'app/stores/groupStore';
 import InlineSvg from 'app/components/inlineSvg';
+import Link from 'app/components/link';
 import LoadingIndicator from 'app/components/loadingIndicator';
 import MemberListStore from 'app/stores/memberListStore';
 import ProjectsStore from 'app/stores/projectsStore';
@@ -178,7 +180,7 @@ const AssigneeSelectorComponent = createReactClass({
   renderNewMemberNodes() {
     let {memberList} = this.state;
     let {size} = this.props;
-    let members = AssigneeSelector.putSessionUserFirst(memberList);
+    let members = AssigneeSelectorComponent.putSessionUserFirst(memberList);
 
     return members.map(member => {
       return {
@@ -271,17 +273,17 @@ const AssigneeSelectorComponent = createReactClass({
             menuFooter={
               canInvite && (
                 <Feature access={['org:write']}>
-                  <MenuItemWrapper
+                  <InviteMemberLink
                     data-test-id="invite-member"
-                    disabled={!loading}
-                    to={`/settings/${this.context.organization.slug}/members/new/`}
-                    query={{referrer: 'assignee_selector'}}
+                    disabled={loading}
+                    to={`/settings/${this.context.organization
+                      .slug}/members/new/?referrer=assignee_selector`}
                   >
                     <IconContainer>
                       <InviteMemberIcon />
                     </IconContainer>
                     <Label>{t('Invite Member')}</Label>
-                  </MenuItemWrapper>
+                  </InviteMemberLink>
                 </Feature>
               )
             }
@@ -315,8 +317,8 @@ const AssigneeSelector = styled(AssigneeSelectorComponent)`
   }
 `;
 
-export default AssigneeSelector
-export {AssigneeSelector: AssigneeSelectorComponent};
+export default AssigneeSelector;
+export {AssigneeSelectorComponent};
 
 const getSvgStyle = () => `
   font-size: 16px;
@@ -341,22 +343,30 @@ const IconContainer = styled.div`
   flex-shrink: 0;
 `;
 
-const MenuItemWrapper = styled(({py, ...props}) => <div {...props} />)`
+const menuItemCss = props => css`
   cursor: pointer;
   display: flex;
   align-items: center;
   font-size: 13px;
-  ${p =>
-    typeof p.py !== 'undefined' &&
+  ${typeof props.py !== 'undefined' &&
     `
-      padding-top: ${p.py};
-      padding-bottom: ${p.py};
+      padding-top: ${props.py};
+      padding-bottom: ${props.py};
     `};
+`;
+
+const MenuItemWrapper = styled(({py, ...props}) => <div {...props} />)`
+  ${menuItemCss};
 `;
 
 const ClearAssignee = styled(MenuItemWrapper)`
   background: rgba(52, 60, 69, 0.03);
   border-bottom: 1px solid rgba(52, 60, 69, 0.06);
+`;
+
+const InviteMemberLink = styled(Link)`
+  ${menuItemCss};
+  color: ${p => p.theme.textColor};
 `;
 
 const Label = styled(TextOverflow)`

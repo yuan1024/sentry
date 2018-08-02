@@ -1,14 +1,13 @@
 import React from 'react';
-import {mount} from 'enzyme';
-import {AssigneeSelector} from 'app/components/assigneeSelector';
 
+import {AssigneeSelectorComponent} from 'app/components/assigneeSelector';
 import {Client} from 'app/api';
-
+import {mount} from 'enzyme';
+import ConfigStore from 'app/stores/configStore';
 import GroupStore from 'app/stores/groupStore';
 import MemberListStore from 'app/stores/memberListStore';
-import ConfigStore from 'app/stores/configStore';
-import TeamStore from 'app/stores/teamStore';
 import ProjectsStore from 'app/stores/projectsStore';
+import TeamStore from 'app/stores/teamStore';
 
 describe('AssigneeSelector', function() {
   let sandbox;
@@ -75,7 +74,7 @@ describe('AssigneeSelector', function() {
     MemberListStore.loaded = false;
 
     assigneeSelector = mount(
-      <AssigneeSelector id={GROUP_1.id} />,
+      <AssigneeSelectorComponent id={GROUP_1.id} />,
       TestStubs.routerContext()
     );
 
@@ -88,7 +87,7 @@ describe('AssigneeSelector', function() {
   });
 
   describe('putSessionUserFirst()', function() {
-    const putSessionUserFirst = AssigneeSelector.putSessionUserFirst;
+    const putSessionUserFirst = AssigneeSelectorComponent.putSessionUserFirst;
     it('should place the session user at the top of the member list if present', function() {
       sandbox
         .stub(ConfigStore, 'get')
@@ -240,12 +239,14 @@ describe('AssigneeSelector', function() {
   });
 
   it('shows invite member button', async function() {
+    let routerContext = TestStubs.routerContext();
+
     openMenu();
     MemberListStore.loadInitialData([USER_1, USER_2]);
     assigneeSelector.update();
     expect(assigneeSelector.find('LoadingIndicator').exists()).toBe(false);
     expect(
-      assigneeSelector.find('MenuItemWrapper[data-test-id="invite-member"]')
+      assigneeSelector.find('InviteMemberLink[data-test-id="invite-member"]')
     ).toHaveLength(0);
 
     assigneeSelector.unmount();
@@ -254,20 +255,28 @@ describe('AssigneeSelector', function() {
       .withArgs('invitesEnabled')
       .returns(true);
     assigneeSelector = mount(
-      <AssigneeSelector id={GROUP_1.id} />,
-      TestStubs.routerContext()
+      <AssigneeSelectorComponent id={GROUP_1.id} />,
+      routerContext
     );
     await tick();
     assigneeSelector.update();
     openMenu();
     expect(
-      assigneeSelector.find('MenuItemWrapper[data-test-id="invite-member"]')
+      assigneeSelector.find('InviteMemberLink[data-test-id="invite-member"]')
     ).toHaveLength(1);
+  });
+
+  it('requires org:write to invite member', async function() {
+    MemberListStore.loadInitialData([USER_1, USER_2]);
+    sandbox
+      .stub(ConfigStore, 'get')
+      .withArgs('invitesEnabled')
+      .returns(true);
 
     // Remove org:write access permission and make sure invite member button is not shown.
     assigneeSelector.unmount();
     assigneeSelector = mount(
-      <AssigneeSelector id={GROUP_1.id} />,
+      <AssigneeSelectorComponent id={GROUP_1.id} />,
       TestStubs.routerContext()
     );
     assigneeSelector.setContext({
@@ -276,7 +285,7 @@ describe('AssigneeSelector', function() {
     openMenu();
     assigneeSelector.update();
     expect(
-      assigneeSelector.find('MenuItemWrapper[data-test-id="invite-member"]')
+      assigneeSelector.find('InviteMemberLink[data-test-id="invite-member"]')
     ).toHaveLength(0);
   });
 
