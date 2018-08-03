@@ -65,9 +65,6 @@ export const Config = PropTypes.shape({
   }),
 });
 
-// TODO(billy): Finalize chart data type
-export const ChartData = PropTypes.any;
-
 export const Deploy = PropTypes.shape({
   environment: PropTypes.string,
   dateFinished: PropTypes.string,
@@ -319,7 +316,6 @@ let SentryTypes = {
     id: PropTypes.string.isRequired,
   }),
   Actor,
-  ChartData,
   Config,
   Deploy,
   Environment,
