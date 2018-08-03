@@ -15,7 +15,7 @@ import overflowEllipsis from 'app/styles/overflowEllipsis';
 import space from 'app/styles/space';
 import theme from 'app/utils/theme';
 import withApi from 'app/utils/withApi';
-import withOrganization from 'app/utils/withOrganization';
+import withLatestContext from 'app/utils/withLatestContext';
 
 import HealthContext from './util/healthContext';
 import HealthRequest from './util/healthRequest';
@@ -231,6 +231,14 @@ const LegendWrapper = styled(Box)`
 
 class OrganizationHealthErrorsContainer extends React.Component {
   render() {
+    // Destructure props from `withLatestContext`
+    let {
+      organizations, // eslint-disable-line
+      project, // eslint-disable-line
+      lastRoute, // eslint-disable-line
+      ...props
+    } = this.props;
+
     return (
       <HealthContext.Consumer>
         {({projects, environments, period}) => (
@@ -238,7 +246,7 @@ class OrganizationHealthErrorsContainer extends React.Component {
             projects={projects}
             environments={environments}
             period={period}
-            {...this.props}
+            {...props}
           />
         )}
       </HealthContext.Consumer>
@@ -246,7 +254,7 @@ class OrganizationHealthErrorsContainer extends React.Component {
   }
 }
 
-export default withApi(withOrganization(OrganizationHealthErrorsContainer));
+export default withApi(withLatestContext(OrganizationHealthErrorsContainer));
 
 const Header = styled(Flex)`
   font-size: 18px;
