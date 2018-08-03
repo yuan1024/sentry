@@ -1,15 +1,5 @@
-import {Client} from 'app/api';
 import EnvironmentActions from 'app/actions/environmentActions';
 import EnvironmentStore from 'app/stores/environmentStore';
-
-export function fetchEnvironmentsForProject(orgId, projectId, hidden) {
-  let api = new Client();
-  return api.requestPromise(`/projects/${orgId}/${projectId}/environments/`, {
-    query: {
-      visibility: hidden ? 'hidden' : 'visible',
-    },
-  });
-}
 
 export function setActiveEnvironment(environment) {
   EnvironmentActions.setActive(environment);
